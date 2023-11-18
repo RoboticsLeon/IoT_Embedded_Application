@@ -18,8 +18,11 @@ AUTOSTART_PROCESSES(&sensor_reading, &timer_process);
 PROCESS_THREAD(sensor_reading, ev, data)
 {
   static float temperature_value;
-  static int ipart_temperature_value;
-  static int fpart_temperature_value;
+  static int16_t ipart_temperature_value;
+  static int16_t fpart_temperature_value;
+
+  // tempc_dec = temp&0x3)*25
+  // temp_int = temp >> 2;
 
   PROCESS_BEGIN();
 
@@ -32,7 +35,7 @@ PROCESS_THREAD(sensor_reading, ev, data)
     /* Print read value */
     ipart_temperature_value = (int)temperature_value;
     fpart_temperature_value = ((temperature_value*100) - (ipart_temperature_value*100));
-    printf("Temperature: %d.%d ºC \n", ipart_temperature_value, fpart_temperature_value);
+    printf("Temperature: %.2d.%.2d ºC \n", ipart_temperature_value, fpart_temperature_value);
 
     /* Wait to receive an event in order to read again */
     PROCESS_WAIT_EVENT();
