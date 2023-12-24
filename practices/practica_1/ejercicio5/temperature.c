@@ -15,27 +15,27 @@ PROCESS(sensor_reading, "Sensor reading process");
 PROCESS(timer_process, "Timer process");
 AUTOSTART_PROCESSES(&sensor_reading, &timer_process);
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(sensor_reading, ev, data)
-{
-  static float temperature_value;
-  static int16_t ipart_temperature_value;
-  static int16_t fpart_temperature_value;
-
-  // tempc_dec = temp&0x3)*25
-  // temp_int = temp >> 2;
+PROCESS_THREAD(sensor_reading, ev, data) {
+  uint16_t sensor_value;
+  struct temperature_t {
+    uint16_t temperatureDec;
+    uint16_t temperatureInt;
+  };
+  struct temperature_t temperature;
 
   PROCESS_BEGIN();
 
-  while(1) {
+  while (1) {
     /* Read temperature value from sensor*/
     SENSORS_ACTIVATE(temperature_sensor);
-    temperature_value = (((float)temperature_sensor.value(0)*25.0F)/100.0F);
+    sensor_value = temperature_sensor.value(0);
     SENSORS_DEACTIVATE(temperature_sensor);
 
     /* Print read value */
-    ipart_temperature_value = (int)temperature_value;
-    fpart_temperature_value = ((temperature_value*100) - (ipart_temperature_value*100));
-    printf("Temperature: %.2d.%.2d ºC \n", ipart_temperature_value, fpart_temperature_value);
+    temperature.temperatureDec = ((sensor_value & 0x3) * 25);
+    temperature.temperatureInt = (sensor_value >> 2);
+    printf("Temperature: %.2d.%.2d ºC \n", temperature.temperatureInt,
+           temperature.temperatureDec);
 
     /* Wait to receive an event in order to read again */
     PROCESS_WAIT_EVENT();
@@ -44,8 +44,7 @@ PROCESS_THREAD(sensor_reading, ev, data)
   PROCESS_END();
 }
 
-PROCESS_THREAD(timer_process, ev, data)
-{
+PROCESS_THREAD(timer_process, ev, data) {
   static struct etimer timer;
 
   PROCESS_BEGIN();
@@ -53,7 +52,7 @@ PROCESS_THREAD(timer_process, ev, data)
   /* Setup a periodic timer that expires after 3 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 3);
 
-  while(1) {
+  while (1) {
     /* Wait for the periodic timer to expire and then restart the timer. */
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
     etimer_reset(&timer);

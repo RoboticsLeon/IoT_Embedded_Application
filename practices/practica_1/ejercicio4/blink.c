@@ -14,8 +14,7 @@ PROCESS(parpadeo_2_process, "Blinking led 2 process");
 PROCESS(timer_process, "Periodic process");
 AUTOSTART_PROCESSES(&parpadeo_1_process, &parpadeo_2_process, &timer_process);
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(parpadeo_1_process, ev, data)
-{
+PROCESS_THREAD(parpadeo_1_process, ev, data) {
   static struct etimer timer;
 
   PROCESS_BEGIN();
@@ -26,7 +25,7 @@ PROCESS_THREAD(parpadeo_1_process, ev, data)
   /* Setup a periodic timer that expires after 2 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 2);
 
-  while(1) {
+  while (1) {
     leds_single_toggle(LEDS_LED1);
 
     /* Wait for the periodic timer to expire and then restart the timer. */
@@ -37,8 +36,7 @@ PROCESS_THREAD(parpadeo_1_process, ev, data)
   PROCESS_END();
 }
 
-PROCESS_THREAD(parpadeo_2_process, ev, data)
-{
+PROCESS_THREAD(parpadeo_2_process, ev, data) {
   static struct etimer timer;
 
   PROCESS_BEGIN();
@@ -49,7 +47,7 @@ PROCESS_THREAD(parpadeo_2_process, ev, data)
   /* Setup a periodic timer that expires after 3 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 3);
 
-  while(1) {
+  while (1) {
     leds_single_toggle(LEDS_LED2);
 
     /* Wait for the periodic timer to expire and then restart the timer. */
@@ -60,12 +58,10 @@ PROCESS_THREAD(parpadeo_2_process, ev, data)
   PROCESS_END();
 }
 
-PROCESS_THREAD(timer_process, ev, data)
-{
+PROCESS_THREAD(timer_process, ev, data) {
   static struct etimer timer;
 
   PROCESS_BEGIN();
-
 
   /* Setup a timer that expires after 5 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 5);
