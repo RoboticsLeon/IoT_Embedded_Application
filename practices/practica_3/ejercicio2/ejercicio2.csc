@@ -6,8 +6,8 @@
   <project EXPORT="discard">[APPS_DIR]/serial_socket</project>
   <project EXPORT="discard">[APPS_DIR]/powertracker</project>
   <simulation>
-    <title>P2_EJ2</title>
-    <speedlimit>1.0</speedlimit>
+    <title>P3_EJ2</title>
+    <speedlimit>2.0</speedlimit>
     <randomseed>123456</randomseed>
     <motedelay_us>1000000</motedelay_us>
     <radiomedium>
@@ -23,10 +23,10 @@
     <motetype>
       org.contikios.cooja.mspmote.SkyMoteType
       <identifier>sky1</identifier>
-      <description>BorderRouter Sky Node</description>
-      <source EXPORT="discard">[CONFIG_DIR]/rpl-border-router/border-router.c</source>
-      <commands EXPORT="discard">make border-router.sky TARGET=sky</commands>
-      <firmware EXPORT="copy">[CONFIG_DIR]/rpl-border-router/border-router.sky</firmware>
+      <description>Server Node</description>
+      <source EXPORT="discard">[CONFIG_DIR]/udp-server.c</source>
+      <commands EXPORT="discard">make udp-server.sky TARGET=sky</commands>
+      <firmware EXPORT="copy">[CONFIG_DIR]/udp-server.sky</firmware>
       <moteinterface>org.contikios.cooja.interfaces.Position</moteinterface>
       <moteinterface>org.contikios.cooja.interfaces.RimeAddress</moteinterface>
       <moteinterface>org.contikios.cooja.interfaces.IPAddress</moteinterface>
@@ -46,10 +46,10 @@
     <motetype>
       org.contikios.cooja.mspmote.Z1MoteType
       <identifier>z11</identifier>
-      <description>Terminal Z1 Node</description>
-      <source EXPORT="discard">[CONFIG_DIR]/rpl-udp/udp-client.c</source>
+      <description>Client Node</description>
+      <source EXPORT="discard">[CONFIG_DIR]/udp-client.c</source>
       <commands EXPORT="discard">make udp-client.z1 TARGET=z1</commands>
-      <firmware EXPORT="copy">[CONFIG_DIR]/rpl-udp/udp-client.z1</firmware>
+      <firmware EXPORT="copy">[CONFIG_DIR]/udp-client.z1</firmware>
       <moteinterface>org.contikios.cooja.interfaces.Position</moteinterface>
       <moteinterface>org.contikios.cooja.interfaces.RimeAddress</moteinterface>
       <moteinterface>org.contikios.cooja.interfaces.IPAddress</moteinterface>
@@ -67,8 +67,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>-19.18388777716124</x>
-        <y>44.198163637738446</y>
+        <x>55.06492812589094</x>
+        <y>54.69858497240361</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -85,8 +85,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>10.265729300450522</x>
-        <y>68.04946971864523</y>
+        <x>85.89696784853672</x>
+        <y>35.33916277679223</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -103,8 +103,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>42.24079792100989</x>
-        <y>46.11766522933287</y>
+        <x>54.49003660129628</x>
+        <y>86.08339855000791</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -121,8 +121,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>71.10101566611725</x>
-        <y>71.28538546065622</y>
+        <x>26.798477751806963</x>
+        <y>35.70998287345682</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -139,23 +139,24 @@
   <plugin>
     org.contikios.cooja.plugins.SimControl
     <width>280</width>
-    <z>0</z>
+    <z>2</z>
     <height>160</height>
-    <location_x>345</location_x>
-    <location_y>54</location_y>
+    <location_x>400</location_x>
+    <location_y>0</location_y>
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.Visualizer
     <plugin_config>
       <moterelations>true</moterelations>
+      <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.IDVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.GridVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.TrafficVisualizerSkin</skin>
-      <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
-      <viewport>1.8191502116040625 0.0 0.0 1.8191502116040625 65.09226986105465 34.07382233907864</viewport>
+      <skin>org.contikios.cooja.plugins.skins.MoteTypeVisualizerSkin</skin>
+      <viewport>2.180762709309324 0.0 0.0 2.180762709309324 86.75689442547663 44.63811161849637</viewport>
     </plugin_config>
-    <width>698</width>
-    <z>2</z>
+    <width>400</width>
+    <z>1</z>
     <height>400</height>
     <location_x>1</location_x>
     <location_y>1</location_y>
@@ -167,42 +168,27 @@
       <formatted_time />
       <coloring />
     </plugin_config>
-    <width>689</width>
+    <width>669</width>
     <z>3</z>
-    <height>439</height>
-    <location_x>4</location_x>
-    <location_y>405</location_y>
+    <height>589</height>
+    <location_x>1</location_x>
+    <location_y>406</location_y>
   </plugin>
   <plugin>
-    org.contikios.cooja.plugins.TimeLine
+    org.contikios.cooja.plugins.Visualizer
     <plugin_config>
-      <mote>0</mote>
-      <mote>1</mote>
-      <mote>2</mote>
-      <mote>3</mote>
-      <showRadioRXTX />
-      <showRadioHW />
-      <showLEDs />
-      <zoomfactor>500.0</zoomfactor>
+      <moterelations>true</moterelations>
+      <skin>org.contikios.cooja.plugins.skins.IDVisualizerSkin</skin>
+      <skin>org.contikios.cooja.plugins.skins.GridVisualizerSkin</skin>
+      <skin>org.contikios.cooja.plugins.skins.TrafficVisualizerSkin</skin>
+      <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
+      <viewport>3.4539728306167756 0.0 0.0 3.4539728306167756 14.399644529229171 -32.69048429370383</viewport>
     </plugin_config>
-    <width>1720</width>
-    <z>4</z>
-    <height>166</height>
-    <location_x>0</location_x>
-    <location_y>853</location_y>
-  </plugin>
-  <plugin>
-    org.contikios.cooja.serialsocket.SerialSocketServer
-    <mote_arg>0</mote_arg>
-    <plugin_config>
-      <port>60001</port>
-      <bound>false</bound>
-    </plugin_config>
-    <width>362</width>
-    <z>1</z>
-    <height>116</height>
-    <location_x>277</location_x>
-    <location_y>227</location_y>
+    <width>400</width>
+    <z>0</z>
+    <height>400</height>
+    <location_x>1</location_x>
+    <location_y>1</location_y>
   </plugin>
 </simconf>
 
