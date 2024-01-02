@@ -9,36 +9,39 @@
 #include "lib/sensors.h"
 #include "temperature-sensor.h"
 
+#include <stdint.h>
 #include <stdio.h>
+
+#define PROCESS_EVENT_AWAKE 0 // Custom user defined event identifier
 /*---------------------------------------------------------------------------*/
 PROCESS(sensor_reading, "Sensor reading process");
 PROCESS(timer_process, "Timer process");
 AUTOSTART_PROCESSES(&sensor_reading, &timer_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(sensor_reading, ev, data) {
-  uint16_t sensor_value;
+  uint16_t sensor_register_value;
   struct temperature_t {
-    uint16_t temperatureDec;
-    uint16_t temperatureInt;
+    uint8_t temperatureInt;
+    uint8_t temperatureDec;
   };
   struct temperature_t temperature;
 
   PROCESS_BEGIN();
 
   while (1) {
+    /* Wait to receive an event in order to read again */
+    PROCESS_WAIT_EVENT_UNTIL(ev == PROCESS_EVENT_AWAKE);
+
     /* Read temperature value from sensor*/
     SENSORS_ACTIVATE(temperature_sensor);
-    sensor_value = temperature_sensor.value(0);
+    sensor_register_value = temperature_sensor.value(0);
     SENSORS_DEACTIVATE(temperature_sensor);
 
     /* Print read value */
-    temperature.temperatureDec = ((sensor_value & 0x3) * 25);
-    temperature.temperatureInt = (sensor_value >> 2);
+    temperature.temperatureInt = (sensor_register_value >> 2);
+    temperature.temperatureDec = ((sensor_register_value & 0x3) * 25U);
     printf("Temperature: %.2d.%.2d ºC \n", temperature.temperatureInt,
            temperature.temperatureDec);
-
-    /* Wait to receive an event in order to read again */
-    PROCESS_WAIT_EVENT();
   }
 
   PROCESS_END();
@@ -57,7 +60,7 @@ PROCESS_THREAD(timer_process, ev, data) {
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
     etimer_reset(&timer);
 
-    process_post_synch(&sensor_reading, PROCESS_EVENT_CONTINUE, NULL);
+    process_post_synch(&sensor_reading, PROCESS_EVENT_AWAKE, NULL);
   }
 
   PROCESS_END();

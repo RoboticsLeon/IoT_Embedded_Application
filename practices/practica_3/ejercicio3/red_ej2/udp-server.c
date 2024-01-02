@@ -31,9 +31,11 @@
 #include "net/ipv6/simple-udp.h"
 #include "net/netstack.h"
 #include "net/routing/routing.h"
-
 #include "sys/log.h"
-#define LOG_MODULE "App"
+
+#include <stdint.h>
+
+#define LOG_MODULE "Server"
 #define LOG_LEVEL LOG_LEVEL_INFO
 
 #define WITH_SERVER_REPLY 1
@@ -51,8 +53,8 @@ static void udp_rx_callback(struct simple_udp_connection *c,
                             const uip_ipaddr_t *receiver_addr,
                             uint16_t receiver_port, const uint8_t *data,
                             uint16_t datalen) {
-  typedef int CelsiusDegrees_t;
-  typedef int FahrenheitDegrees_t;
+  typedef uint8_t CelsiusDegrees_t;
+  typedef uint8_t FahrenheitDegrees_t;
   CelsiusDegrees_t receivedTemperature;
   FahrenheitDegrees_t processedTemperature;
 

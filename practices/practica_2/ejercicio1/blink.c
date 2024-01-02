@@ -1,6 +1,6 @@
 /**
  * \file
- *         Ejercicio 4: Parpadeo LEDs
+ *         Ejercicio 1: Parpadeo LEDs
  * \author
  *         Sergio Leon <schoolion01@gmail.com>
  */
@@ -20,7 +20,7 @@ PROCESS_THREAD(parpadeo_1_process, ev, data) {
   PROCESS_BEGIN();
 
   /* Wait to receive an event from timer_process in order to continue */
-  PROCESS_WAIT_EVENT();
+  PROCESS_WAIT_EVENT_UNTIL(PROCESS_EVENT_POLL);
 
   /* Setup a periodic timer that expires after 2 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 2);
@@ -42,7 +42,7 @@ PROCESS_THREAD(parpadeo_2_process, ev, data) {
   PROCESS_BEGIN();
 
   /* Wait to receive an event from timer_process in order to continue */
-  PROCESS_WAIT_EVENT();
+  PROCESS_WAIT_EVENT_UNTIL(PROCESS_EVENT_POLL);
 
   /* Setup a periodic timer that expires after 4 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 4);

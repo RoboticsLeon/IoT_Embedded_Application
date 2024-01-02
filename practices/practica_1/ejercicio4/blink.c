@@ -20,17 +20,17 @@ PROCESS_THREAD(parpadeo_1_process, ev, data) {
   PROCESS_BEGIN();
 
   /* Wait to receive an event from timer_process in order to continue */
-  PROCESS_WAIT_EVENT();
+  PROCESS_WAIT_EVENT_UNTIL(ev == PROCESS_EVENT_POLL);
 
   /* Setup a periodic timer that expires after 2 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 2);
 
   while (1) {
     leds_single_toggle(LEDS_LED1);
+    etimer_reset(&timer);
 
     /* Wait for the periodic timer to expire and then restart the timer. */
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
-    etimer_reset(&timer);
   }
 
   PROCESS_END();
@@ -42,7 +42,7 @@ PROCESS_THREAD(parpadeo_2_process, ev, data) {
   PROCESS_BEGIN();
 
   /* Wait to receive an event from timer_process in order to continue */
-  PROCESS_WAIT_EVENT();
+  PROCESS_WAIT_EVENT_UNTIL(ev == PROCESS_EVENT_POLL);
 
   /* Setup a periodic timer that expires after 3 seconds. */
   etimer_set(&timer, CLOCK_SECOND * 3);

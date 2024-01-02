@@ -22,7 +22,9 @@ LOG = logging.getLogger("[mqtt-exporter]")
 ########################################################################
 
 prom_msg_counter = None
-prom_temp_gauge = None
+prom_tempCelsius_gauge = None
+prom_tempFahrenheit_gauge = None
+prom_switchStatus_gauge = None
 
 def create_msg_counter_metrics():
     global prom_msg_counter
@@ -31,11 +33,25 @@ def create_msg_counter_metrics():
         'Number of received messages'
     )
 
-def create_temp_gauge_metrics():
-    global prom_temp_gauge
+def create_tempCelsius_gauge_metrics():
+    global prom_tempCelsius_gauge
 
-    prom_temp_gauge = Gauge( 'temp',
+    prom_tempCelsius_gauge = Gauge( 'tempCelsius',
         'Temperature [Celsius Degrees]'
+    )
+    
+def create_tempFahrenheit_gauge_metrics():
+    global prom_tempFahrenheit_gauge
+
+    prom_tempFahrenheit_gauge = Gauge( 'tempFahrenheit',
+        'Temperature [Fahrenheit Degrees]'
+    )
+    
+def create_switchStatus_gauge_metrics():
+    global prom_switchStatus_gauge
+
+    prom_switchStatus_gauge = Gauge( 'switchStatus',
+        'Switch Status [Open "1", Close "2"]'
     )
 
 def parse_message(raw_topic, raw_payload):
@@ -88,7 +104,9 @@ def on_connect(client, _, __, rc):
     LOG.info(" Connected with result code: %s", rc)
     print(" Connected with result code: {0:d}".format(rc))
     
-    client.subscribe("Temp")
+    client.subscribe("temp_c")
+    client.subscribe("temp_F")
+    client.subscribe("switch")
     if rc != mqtt.CONNACK_ACCEPTED:
         LOG.error("[ERROR]: MQTT %s", rc)
         print("[ERROR]: MQTT {0:d}".format(rc))
@@ -111,7 +129,12 @@ def on_message(_, userdata, msg):
         return
 
     prom_msg_counter.inc()
-    prom_temp_gauge.set(payload)
+    if topic == "temp_c":
+        prom_tempCelsius_gauge.set(payload)
+    elif topic == "temp_F":
+        prom_tempFahrenheit_gauge.set(payload)
+    elif topic == "switch":
+        prom_switchStatus_gauge.set(payload)
 
 ########################################################################
 # Main
@@ -148,7 +171,9 @@ def main():
 
     # Create Prometheus metrics
     create_msg_counter_metrics()
-    create_temp_gauge_metrics()
+    create_tempCelsius_gauge_metrics()
+    create_tempFahrenheit_gauge_metrics()
+    create_switchStatus_gauge_metrics()
     # Start prometheus server
     start_http_server(9000)
 
@@ -179,7 +204,9 @@ def main():
             index = index + 1
         
         # Publish data on corresponding topic
-        client.publish(topic="Temp", payload=fields[0], qos=0, retain=False)
+        client.publish(topic="temp_c", payload=fields[0], qos=0, retain=False)
+        client.publish(topic="temp_F", payload=fields[1], qos=0, retain=False)
+        client.publish(topic="switch", payload=fields[2], qos=0, retain=False)
 
 
 ########################################################################

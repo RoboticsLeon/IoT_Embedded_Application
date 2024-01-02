@@ -1,6 +1,6 @@
 /**
  * \file
- *         Ejercicio 5: Medida de la temperatura interna
+ *         Ejercicio 1: Medida de la temperatura interna
  * \author
  *         Sergio Leon <schoolion01@gmail.com>
  */
@@ -9,20 +9,23 @@
 #include "lib/sensors.h"
 #include "temperature-sensor.h"
 
+#include <stdint.h>
 #include <stdio.h>
+
+#define PROCESS_EVENT_AWAKE 0 // Custom user defined event identifier
 /*---------------------------------------------------------------------------*/
 PROCESS(sensor_reading, "Sensor reading process");
 PROCESS(timer_process, "Timer process");
 AUTOSTART_PROCESSES(&sensor_reading, &timer_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(sensor_reading, ev, data) {
-  static int16_t temperature_register_value;
+  uint16_t temperature_register_value;
   struct temperature_t {
-    uint16_t temperatureDec;
-    uint16_t temperatureInt;
+    uint8_t temperatureDec;
+    uint8_t temperatureInt;
   };
-  static struct temperature_t temperature_C;
-  static struct temperature_t temperature_F;
+  struct temperature_t temperature_C;
+  struct temperature_t temperature_F;
 
   PROCESS_BEGIN();
 
@@ -33,15 +36,20 @@ PROCESS_THREAD(sensor_reading, ev, data) {
     SENSORS_DEACTIVATE(temperature_sensor);
 
     /* Print read value */
-    temperature_C.temperatureInt = (temperature_register_value & 0x3) * 25U;
-    temperature_C.temperatureDec = (temperature_register_value >> 2);
-    temperature_F.temperatureInt = (2 * temperature_C.temperatureInt + 32);
-    temperature_F.temperatureDec = temperature_C.temperatureDec;
+    temperature_C.temperatureInt = (temperature_register_value >> 2);
+    temperature_C.temperatureDec = (temperature_register_value & 0x3) * 25U;
+    temperature_F.temperatureInt = (2U * temperature_C.temperatureInt + 32U);
+    temperature_F.temperatureDec = (2U * temperature_C.temperatureDec);
+    if (temperature_F.temperatureDec >= 100U) {
+      temperature_F.temperatureDec -= 100U;
+      temperature_F.temperatureInt++;
+    }
+
     printf("%.2d.%.2d\n", temperature_F.temperatureInt,
            temperature_F.temperatureDec);
 
     /* Wait to receive an event in order to read again */
-    PROCESS_WAIT_EVENT();
+    PROCESS_WAIT_EVENT_UNTIL(ev == PROCESS_EVENT_AWAKE);
   }
 
   PROCESS_END();
@@ -60,7 +68,7 @@ PROCESS_THREAD(timer_process, ev, data) {
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
     etimer_reset(&timer);
 
-    process_post_synch(&sensor_reading, PROCESS_EVENT_CONTINUE, NULL);
+    process_post_synch(&sensor_reading, PROCESS_EVENT_AWAKE, NULL);
   }
 
   PROCESS_END();

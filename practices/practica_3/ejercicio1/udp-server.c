@@ -53,27 +53,36 @@ static void udp_rx_callback(struct simple_udp_connection *c,
                             const uip_ipaddr_t *receiver_addr,
                             uint16_t receiver_port, const uint8_t *data,
                             uint16_t datalen) {
-  typedef uint8_t CelsiusDegrees_t;
-  typedef uint8_t FahrenheitDegrees_t;
+  typedef float CelsiusDegrees_t;
+  typedef float FahrenheitDegrees_t;
   CelsiusDegrees_t receivedTemperature;
+  uint8_t temperatureInt;
+  uint8_t temperatureDec;
   FahrenheitDegrees_t processedTemperature;
 
-  receivedTemperature = *data;
-  LOG_INFO("Info recibida del nodo: '%d' grados\n", receivedTemperature);
+  receivedTemperature = *((float *)data);
+  temperatureInt = (uint8_t)receivedTemperature;
+  temperatureDec = ((receivedTemperature - (float)temperatureInt) * 100U);
+  LOG_INFO("Info recibida del nodo: '%.2d.%.2d' grados\n", temperatureInt,
+           temperatureDec);
   LOG_INFO("Direccion = ");
   LOG_INFO_6ADDR(sender_addr);
   LOG_INFO_("\n");
-  LOG_INFO_("TEMPERATURA RECIBIDA = %d\n", receivedTemperature);
+  LOG_INFO_("TEMPERATURA RECIBIDA = %.2d.%.2d\n", temperatureInt,
+            temperatureDec);
 
-  processedTemperature = (2 * receivedTemperature + 32);
+  processedTemperature = (2U * receivedTemperature + 32.0F);
 
 #if WITH_SERVER_REPLY
   /* send back the same string to the client as an echo reply */
-  LOG_INFO("Enviando temperatura en Fahrenheit = %d\n", processedTemperature);
+  temperatureInt = (uint8_t)processedTemperature;
+  temperatureDec = ((processedTemperature - (float)temperatureInt) * 100U);
+  LOG_INFO("Enviando temperatura en Fahrenheit = %.2d.%.2d\n", temperatureInt,
+           temperatureDec);
   LOG_INFO("Destino = ");
   LOG_INFO_6ADDR(sender_addr);
   LOG_INFO_("\n");
-  simple_udp_sendto(&udp_conn, &processedTemperature,
+  simple_udp_sendto(&udp_conn, (void *)&processedTemperature,
                     sizeof(processedTemperature), sender_addr);
 #endif /* WITH_SERVER_REPLY */
 }

@@ -35,7 +35,7 @@ def create_temp_gauge_metrics():
     global prom_temp_gauge
 
     prom_temp_gauge = Gauge( 'temp',
-        'Temperature [Celsius Degrees]'
+        'Temperature [Fahrenheit Degrees]'
     )
 
 def parse_message(raw_topic, raw_payload):
@@ -88,7 +88,7 @@ def on_connect(client, _, __, rc):
     LOG.info(" Connected with result code: %s", rc)
     print(" Connected with result code: {0:d}".format(rc))
     
-    client.subscribe("TempF")
+    client.subscribe("temp_F")
     if rc != mqtt.CONNACK_ACCEPTED:
         LOG.error("[ERROR]: MQTT %s", rc)
         print("[ERROR]: MQTT {0:d}".format(rc))
